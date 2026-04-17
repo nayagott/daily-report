@@ -16,7 +16,7 @@ export function apiError(
   status: number,
   code: string,
   message: string,
-  details?: unknown[],
+  details?: Array<{ field: string; message: string }>,
 ): NextResponse {
   return NextResponse.json(
     {
