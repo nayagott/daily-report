@@ -13,7 +13,15 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:prod": "prisma migrate deploy",
+    "db:seed": "dotenv -e .env -- npx tsx prisma/seed.ts",
+    "db:studio": "prisma studio",
+    "db:generate": "prisma generate",
     "prepare": "husky"
+  },
+  "prisma": {
+    "seed": "npx tsx prisma/seed.ts"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -28,9 +36,37 @@
     ]
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@prisma/adapter-pg": "^7.7.0",
+    "@prisma/client": "^7.7.0",
+    "@radix-ui/react-alert-dialog": "^1.1.15",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-label": "^2.1.8",
+    "@radix-ui/react-popover": "^1.1.15",
+    "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-separator": "^1.1.8",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@tailwindcss/postcss": "^4.2.2",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/pg": "^8.20.0",
+    "bcryptjs": "^3.0.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
+    "dotenv": "^17.4.2",
+    "jose": "^6.2.2",
+    "lucide-react": "^1.8.0",
     "next": "^15.3.1",
+    "next-themes": "^0.4.6",
+    "pg": "^8.20.0",
+    "postcss": "^8.5.10",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.72.1",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.5.0",
+    "tailwindcss": "^4.2.2",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
@@ -49,6 +85,8 @@
     "lint-staged": "^16.4.0",
     "msw": "^2.13.4",
     "prettier": "^3.8.3",
+    "prisma": "^7.7.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.8.3",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.1.4"
