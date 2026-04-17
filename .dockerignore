@@ -1,0 +1,11 @@
+.git
+.github
+.next
+.husky
+node_modules
+coverage
+*.md
+*.test.*
+*.spec.*
+src/tests/
+.env*

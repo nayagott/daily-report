@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ────────────────────────────────────────────────────────────────
+// Enum
+// ────────────────────────────────────────────────────────────────
+
+enum Role {
+  SALES
+  MANAGER
+}
+
+// ────────────────────────────────────────────────────────────────
+// Models
+// ────────────────────────────────────────────────────────────────
+
+model User {
+  userId     Int      @id @default(autoincrement()) @map("user_id")
+  name       String
+  email      String   @unique
+  department String?
+  role       Role
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // relations
+  dailyReports DailyReport[]
+  comments     Comment[]
+
+  @@map("users")
+}
+
+model Customer {
+  customerId  Int      @id @default(autoincrement()) @map("customer_id")
+  companyName String   @unique @map("company_name")
+  contactName String?  @map("contact_name")
+  phone       String?
+  address     String?
+  industry    String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // relations
+  visitRecords VisitRecord[]
+
+  @@map("customers")
+}
+
+model DailyReport {
+  reportId   Int      @id @default(autoincrement()) @map("report_id")
+  userId     Int      @map("user_id")
+  reportDate DateTime @map("report_date") @db.Date
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // relations
+  user         User          @relation(fields: [userId], references: [userId])
+  visitRecords VisitRecord[]
+  problems     Problem[]
+  plans        Plan[]
+
+  // 동일 사용자 + 동일 날짜 보고서 중복 방지
+  @@unique([userId, reportDate])
+  @@map("daily_reports")
+}
+
+model VisitRecord {
+  visitId    Int      @id @default(autoincrement()) @map("visit_id")
+  reportId   Int      @map("report_id")
+  customerId Int      @map("customer_id")
+  content    String
+  visitTime  String?  @map("visit_time") // HH:MM 형식
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // relations
+  report   DailyReport @relation(fields: [reportId], references: [reportId], onDelete: Cascade)
+  customer Customer    @relation(fields: [customerId], references: [customerId])
+
+  @@map("visit_records")
+}
+
+model Problem {
+  problemId Int      @id @default(autoincrement()) @map("problem_id")
+  reportId  Int      @map("report_id")
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // relations
+  report   DailyReport @relation(fields: [reportId], references: [reportId], onDelete: Cascade)
+  comments Comment[]
+
+  @@map("problems")
+}
+
+model Plan {
+  planId    Int      @id @default(autoincrement()) @map("plan_id")
+  reportId  Int      @map("report_id")
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // relations
+  report   DailyReport @relation(fields: [reportId], references: [reportId], onDelete: Cascade)
+  comments Comment[]
+
+  @@map("plans")
+}
+
+model Comment {
+  commentId Int      @id @default(autoincrement()) @map("comment_id")
+  problemId Int?     @map("problem_id") // Problem 귀속 시 사용
+  planId    Int?     @map("plan_id")    // Plan 귀속 시 사용
+  authorId  Int      @map("author_id")
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // relations
+  problem Problem? @relation(fields: [problemId], references: [problemId], onDelete: Cascade)
+  plan    Plan?    @relation(fields: [planId], references: [planId], onDelete: Cascade)
+  author  User     @relation(fields: [authorId], references: [userId])
+
+  // problemId, planId 중 하나만 NOT NULL 임을 애플리케이션 레이어에서 보장
+  // (DB 레벨 CHECK 제약은 migration 파일에서 추가: CHECK (num_nonnulls(problem_id, plan_id) = 1))
+  @@map("comments")
+}
